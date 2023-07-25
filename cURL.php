@@ -5,17 +5,24 @@ namespace curl;
 class Request
 {
     // Değişkenleri tanımlama
-    public static $ch;
-    public static $header = array();
-    public static $postData = array();
-    public static $curlURL;
-    public static $timeout;
+    private static $ch;
+    private static $header = array();
+    private static $postData = array();
+    private static $curlURL;
+    private static $timeout;
+    
+
+    function __construct() {
+        self::$ch = curl_init();
+    }
 
     // URL belirleme fonksiyonu
     public static function URL($url) {
-        self::$ch = curl_init();
         self::$curlURL = $url;
-        curl_setopt(self::$ch, CURLOPT_URL, $url);
+        self::$header = null;
+        self::$postData = null; 
+        self::$timeout = 1;
+
         return new self;
     }
 
@@ -33,7 +40,7 @@ class Request
         return new self;
     }
 
-    // Cookie Belirler
+    // Cookie Dosyasını Belirler
     // Örnek: ->cookieFile("/Applications/XAMPP/xamppfiles/htdocs/cookie.txt")
     public static function cookieFile($cookieFile = "") {
         curl_setopt(self::$ch, CURLOPT_COOKIEFILE, $cookieFile);
@@ -49,6 +56,7 @@ class Request
 
     // GET Request çalıştırır
     public static function get() {
+        curl_setopt(self::$ch, CURLOPT_URL, self::$curlURL);
         curl_setopt(self::$ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt(self::$ch, CURLOPT_FOLLOWLOCATION, true);
         $response = curl_exec(self::$ch);
@@ -58,6 +66,7 @@ class Request
     // POST Request çalıştırır
     // Örnek: ->post(["key1" => "value1", "key2" => "value2"])
     public static function post($data = array()) {
+        curl_setopt(self::$ch, CURLOPT_URL, self::$curlURL);
         curl_setopt(self::$ch, CURLOPT_POST, 1);
         curl_setopt(self::$ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt(self::$ch, CURLOPT_FOLLOWLOCATION, true);
@@ -66,4 +75,3 @@ class Request
         return $response;
     }
 }
-?>
